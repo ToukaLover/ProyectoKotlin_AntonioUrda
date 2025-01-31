@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "784818096662",
+    "project_id": "gymbasics-c85dd",
+    "storage_bucket": "gymbasics-c85dd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:784818096662:android:abfff58d0f135f91940337",
+        "android_client_info": {
+          "package_name": "com.antoniourda.proyectoantonio"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoZDIXNEpx00eZ-1i888Rc__80zabOWkc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
