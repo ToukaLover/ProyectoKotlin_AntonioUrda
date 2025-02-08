@@ -1,10 +1,9 @@
 package com.antoniourda.proyectoantonio
 
-import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
-import android.util.Patterns
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -16,11 +15,24 @@ import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
-    @SuppressLint("MissingInflatedId")
+
+    companion object {
+        private const val PREFS_NAME = "sharedpreferences"
+        private const val KEY_CORREO = "Correo"
+        private const val KEY_PROVEEDOR = "Proveedor"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Verificar si hay una sesión guardada ANTES de cargar la UI
+        if (verificarSesion()) {
+            return
+        }
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -29,39 +41,28 @@ class MainActivity : AppCompatActivity() {
 
         val olvido = findViewById<TextView>(R.id.olvido)
         val btnLogin = findViewById<Button>(R.id.iniciarSesion)
-        var correo = findViewById<TextInputLayout>(R.id.nombreUsuario1)
-        var pass = findViewById<TextInputLayout>(R.id.password1)
+        val correo = findViewById<TextInputLayout>(R.id.nombreUsuario1)
+        val pass = findViewById<TextInputLayout>(R.id.password1)
         val btnRegister = findViewById<Button>(R.id.register)
 
-        olvido.setOnClickListener{
-
-            if(correo.editText?.text.toString()!=""){
-                if(Patterns.EMAIL_ADDRESS.matcher(correo.editText?.text.toString()).matches()){
-                    resetPassword(correo.editText?.text.toString())
-                }else{
-                    Toast.makeText(this, "Formato de correo incorrecto", Toast.LENGTH_LONG).show()
-                }
-            }else{
-                Toast.makeText(this, "Introduce un correo", Toast.LENGTH_LONG).show()
+        olvido.setOnClickListener {
+            val emailText = correo.editText?.text.toString()
+            if (emailText.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(emailText).matches()) {
+                resetPassword(emailText)
+            } else {
+                Toast.makeText(this, "Introduce un correo válido", Toast.LENGTH_LONG).show()
             }
-
         }
 
         btnLogin.setOnClickListener {
-            if(pass.editText?.text.toString()!=""){
-                if(correo.editText?.text.toString()!="" && Patterns.EMAIL_ADDRESS.matcher(correo.editText?.text.toString()).matches()){
-                    login_firebase(correo.editText?.text.toString(), pass.editText?.text.toString())
-                    login_firebase(correo.editText?.text.toString(), pass.editText?.text.toString())
-                    login_firebase(correo.editText?.text.toString(), pass.editText?.text.toString())
-                }else{
-                    Log.d("TAG", "correo: "+correo)
-                    Toast.makeText(this, "Formato de correo incorrecto", Toast.LENGTH_LONG).show()
-                }
-            }
-            else{
-                Toast.makeText(this, "Introduce contraseña", Toast.LENGTH_LONG).show()
-            }
+            val emailText = correo.editText?.text.toString()
+            val passText = pass.editText?.text.toString()
 
+            if (emailText.isNotEmpty() && passText.isNotEmpty()) {
+                loginFirebase(emailText, passText)
+            } else {
+                Toast.makeText(this, "Introduce correo y contraseña", Toast.LENGTH_LONG).show()
+            }
         }
 
         btnRegister.setOnClickListener {
@@ -69,29 +70,52 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun login_firebase(correo: String, pass: String){
+    private fun loginFirebase(correo: String, pass: String) {
         FirebaseAuth.getInstance().signInWithEmailAndPassword(correo, pass)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    val intent = Intent(this, home::class.java)
-                    intent.putExtra("Correo", correo)
-                    intent.putExtra("Proveedor", "Usuario/Contraseña")
-                    startActivity(intent);
+                    guardarSesion(correo, "Usuario/Contraseña")
+                    irAHome(correo, "Usuario/Contraseña")
                 } else {
                     Toast.makeText(this, "Usuario/Contraseña incorrecto(s)", Toast.LENGTH_LONG).show()
                 }
             }
     }
 
-    fun resetPassword(email: String) {
-        val auth = FirebaseAuth.getInstance()
-        auth.sendPasswordResetEmail(email)
+    private fun resetPassword(email: String) {
+        FirebaseAuth.getInstance().sendPasswordResetEmail(email)
             .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Toast.makeText(this, "Correo de recuperación enviado.", Toast.LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(this, "Correo no existente", Toast.LENGTH_LONG).show()
-                }
+                val message = if (task.isSuccessful) "Correo de recuperación enviado." else "Correo no existente"
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show()
             }
+    }
+
+    private fun guardarSesion(correo: String, proveedor: String) {
+        val prefs: SharedPreferences.Editor = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
+        prefs.putString(KEY_CORREO, correo)
+        prefs.putString(KEY_PROVEEDOR, proveedor)
+        prefs.apply()
+    }
+
+    private fun verificarSesion(): Boolean {
+        val prefs: SharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val correo = prefs.getString(KEY_CORREO, null)
+        val proveedor = prefs.getString(KEY_PROVEEDOR, null)
+
+        return if (correo != null && proveedor != null) {
+            irAHome(correo, proveedor)
+            true
+        } else {
+            false
+        }
+    }
+
+    private fun irAHome(correo: String, proveedor: String) {
+        val intent = Intent(this, home::class.java).apply {
+            putExtra("Correo", correo)
+            putExtra("Proveedor", proveedor)
+        }
+        startActivity(intent)
+        finish()
     }
 }

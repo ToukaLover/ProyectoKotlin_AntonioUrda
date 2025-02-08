@@ -1,5 +1,6 @@
 package com.antoniourda.proyectoantonio
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
@@ -63,10 +64,18 @@ class RegisterDialog : DialogFragment() {
                     intent.putExtra("Proveedor", "Usuario/Contraseña")
                     startActivity(intent)
 
+                    guardarSesion(task.result.user?.email.toString(), "Usuario/Contraseña")
+
                     Toast.makeText(requireContext(), "Cuenta creada", Toast.LENGTH_LONG).show()
                 } else {
                     Toast.makeText(requireContext(), "contraseña corta/usuario existente", Toast.LENGTH_LONG).show()
                 }
             }
+    }
+    fun guardarSesion(correo: String, proveedor: String) {
+        val prefs = requireActivity().getSharedPreferences("sharedpreferences", Context.MODE_PRIVATE).edit()
+        prefs.putString("Correo", correo)
+        prefs.putString("Proveedor", proveedor)
+        prefs.apply()
     }
 }

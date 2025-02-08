@@ -1,7 +1,10 @@
 package com.antoniourda.proyectoantonio
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -23,13 +26,7 @@ class home : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-        var botonSalir = findViewById<Button>(R.id.salir)
 
-
-        botonSalir.setOnClickListener{
-            var intent = Intent(this,MainActivity::class.java)
-            startActivity(intent)
-        }
 
         // Vincular los elementos del diseño
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -67,6 +64,9 @@ class home : AppCompatActivity() {
                     val intent = Intent(this, MainActivity2::class.java)
                     startActivity(intent)
                 }
+                R.id.nav_cerrarsesion ->{
+                    borrar_sesion()
+                }
             }
             drawerLayout.closeDrawers() // Cierra el drawer después de seleccionar una opción
             true
@@ -93,4 +93,17 @@ class home : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
+    fun borrar_sesion() {
+        val prefs = getSharedPreferences("sharedpreferences", Context.MODE_PRIVATE).edit()
+        prefs.clear()
+        prefs.apply()
+
+        // Redirigir al usuario a la pantalla de inicio de sesión
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // Evita que el usuario vuelva atrás
+        startActivity(intent)
+        finish()
+    }
+
 }
