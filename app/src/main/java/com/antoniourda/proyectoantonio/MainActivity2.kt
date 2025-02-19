@@ -45,13 +45,13 @@ class MainActivity2 : AppCompatActivity() {
         })
         recycler.adapter = adapter
 
-        // Cargar ejercicios
+        // Cargar ejercicios desde Firebase
         controller.setOnDataChangeListener(object : Controller.OnDataChangeListener {
             override fun onDataChanged() {
                 adapter.updateList(controller.getAllEjercicios().toMutableList())
             }
         })
-        controller.cargarEjercicios() // Cargar ejercicios al iniciar
+        controller.cargarEjerciciosDesdeFirebase() // Cargar ejercicios al iniciar
 
         // Botón para agregar ejercicios
         anadir.setOnClickListener {

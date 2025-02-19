@@ -69,7 +69,7 @@ class editDialog(
             ejercicio.categoria = updatedCategoria
 
             // Notificar al controlador que los datos han cambiado
-            controller.dataCambiada()
+            controller.editarEjercicio(ejercicio)
             dismiss() // Cierra el diálogo
         }
 

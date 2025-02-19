@@ -1,11 +1,15 @@
 package com.antoniourda.proyectoantonio.controller
 
 import android.content.Context
+import android.util.Log
 import com.antoniourda.proyectoantonio.models.Ejercicio
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class Controller(private val context: Context) {
+    private val db: FirebaseFirestore = Firebase.firestore
     private val ejerciciosList = mutableListOf<Ejercicio>()
-    private var nextId = 1 // Para generar IDs autoincrementales
 
     interface OnDataChangeListener {
         fun onDataChanged()
@@ -17,23 +21,54 @@ class Controller(private val context: Context) {
         this.listener = listener
     }
 
-    fun cargarEjercicios() {
-        // Aquí puedes añadir ejercicios de ejemplo si quieres
-        // Por ejemplo:
-        // agregarEjercicio(Ejercicio(nombre = "Flexiones", repeticionesRecomendadas = 10, imagen = "flexiones", categoria = "Pecho"))
-        // agregarEjercicio(Ejercicio(nombre = "Sentadillas", repeticionesRecomendadas = 15, imagen = "sentadillas", categoria = "Piernas"))
-        listener?.onDataChanged()
+    fun cargarEjerciciosDesdeFirebase() {
+        db.collection("ejercicios")
+            .orderBy("nombre") // Ordena por nombre, puedes cambiarlo
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e("Controller", "Error al cargar ejercicios", error)
+                    return@addSnapshotListener
+                }
+
+                snapshot?.let {
+                    ejerciciosList.clear()
+                    for (document in it.documents) {
+                        val ejercicio = document.toObject(Ejercicio::class.java)
+                        ejercicio?.let { e -> ejerciciosList.add(e) }
+                    }
+                    listener?.onDataChanged()
+                }
+            }
     }
 
     fun agregarEjercicio(ejercicio: Ejercicio) {
-        ejercicio.id = nextId++ // Asigna el siguiente ID disponible
-        ejerciciosList.add(ejercicio)
-        listener?.onDataChanged()
+        db.collection("ejercicios").add(ejercicio)
+            .addOnSuccessListener { documentReference ->
+                Log.d("Controller", "Ejercicio agregado con ID: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                Log.e("Controller", "Error al agregar ejercicio", e)
+            }
     }
 
     fun eliminarEjercicio(ejercicio: Ejercicio) {
-        ejerciciosList.remove(ejercicio)
-        listener?.onDataChanged()
+        db.collection("ejercicios").document(ejercicio.id).delete()
+            .addOnSuccessListener {
+                Log.d("Controller", "Ejercicio eliminado con ID: ${ejercicio.id}")
+            }
+            .addOnFailureListener { e ->
+                Log.e("Controller", "Error al eliminar ejercicio", e)
+            }
+    }
+    fun editarEjercicio(ejercicio: Ejercicio) {
+        db.collection("ejercicios").document(ejercicio.id)
+            .set(ejercicio)
+            .addOnSuccessListener {
+                Log.d("Controller", "Ejercicio editado con ID: ${ejercicio.id}")
+            }
+            .addOnFailureListener { e ->
+                Log.e("Controller", "Error al editar ejercicio", e)
+            }
     }
 
     fun dataCambiada(){
