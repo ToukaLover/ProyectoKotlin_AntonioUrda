@@ -5,3 +5,9 @@ plugins {
     id("com.google.gms.google-services") version "4.4.2" apply false
 
 }
+buildscript {
+    dependencies {
+        // ... otras dependencias
+        classpath ("com.google.gms:google-services:4.3.10") // Añade esta línea
+    }
+}

@@ -34,7 +34,6 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-
 }
 
 dependencies {
@@ -45,18 +44,15 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.ui.ktx)
+
+    // Firebase Dependencies
+    implementation(platform("com.google.firebase:firebase-bom:33.8.0")) // Firebase BOM
+    implementation("com.google.firebase:firebase-analytics-ktx") // Firebase Analytics
+    implementation("com.google.firebase:firebase-auth-ktx") // Firebase Authentication
+    implementation("com.google.firebase:firebase-database-ktx") // Firebase Realtime Database
+    implementation("com.google.firebase:firebase-firestore-ktx") // Firebase Firestore
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-auth")
-
-    implementation ("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
-
-
-    implementation ("com.google.android.gms:play-services-measurement-api:21.0.0") // Try an older version
-    implementation ("com.google.android.gms:play-services-measurement-impl:21.0.0")
-
-
 }

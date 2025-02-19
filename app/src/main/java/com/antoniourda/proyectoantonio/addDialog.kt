@@ -9,7 +9,6 @@ import android.widget.EditText
 import com.antoniourda.proyectoantonio.adapter.Adapter
 import com.antoniourda.proyectoantonio.controller.Controller
 import com.antoniourda.proyectoantonio.models.Ejercicio
-import kotlin.contracts.contract
 
 class addDialog(context: Context,
                 var controller: Controller,
@@ -38,14 +37,14 @@ class addDialog(context: Context,
         saveButton.setOnClickListener {
 
             val nombre = nameEditText.text.toString().trim()
-            val repes = repes.text.toString().trim().toIntOrNull() ?: 0
-            val imagen = imagen.text.toString().trim()
-            val categoria = categoria.text.toString().trim()
+            val repesCount = repes.text.toString().trim().toIntOrNull() ?: 0
+            val imagenName = imagen.text.toString().trim()
+            val categoriaName = categoria.text.toString().trim()
 
-            if (nombre.isNotEmpty() && imagen.isNotEmpty()) {
-                val nuevoEjercicio = Ejercicio(nombre, repes, imagen,categoria)
-
-                controller.addEjercicio(nuevoEjercicio) // Agrega al Controller
+            if (nombre.isNotEmpty() && imagenName.isNotEmpty()) {
+                // Crea un nuevo objeto Ejercicio y añade a Firebase
+                val nuevoEjercicio = Ejercicio(nombre = nombre, repeticionesRecomendadas = repesCount, imagen = imagenName, categoria = categoriaName)
+                controller.agregarEjercicio(nuevoEjercicio) // Agrega al Controller
                 dismiss() // Cierra el diálogo
             }
         }
