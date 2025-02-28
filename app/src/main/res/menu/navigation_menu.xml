@@ -6,9 +6,6 @@
         android:id="@+id/nav_inicio"
         android:title="Inicio" />
     <item
-        android:id="@+id/nav_tips"
-        android:title="Tips" />
-    <item
         android:id="@+id/nav_cerrarsesion"
         android:title="Cerrar Sesion" />
 </menu>

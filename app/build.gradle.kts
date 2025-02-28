@@ -51,7 +51,8 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx") // Firebase Authentication
     implementation("com.google.firebase:firebase-database-ktx") // Firebase Realtime Database
     implementation("com.google.firebase:firebase-firestore-ktx") // Firebase Firestore
-
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
