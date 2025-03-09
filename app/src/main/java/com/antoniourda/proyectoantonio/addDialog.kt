@@ -24,7 +24,7 @@ class addDialog(context: Context,
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.dialog_edit)
+        setContentView(R.layout.dialog_add)
 
         nameEditText = findViewById(R.id.profile_name)
         repes = findViewById(R.id.repes)
